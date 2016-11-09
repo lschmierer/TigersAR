@@ -1,54 +1,67 @@
 package de.dhbw.tigersar;
 
-import org.artoolkit.ar.base.ARToolKit;
-import org.artoolkit.ar.base.rendering.ARRenderer;
-import org.artoolkit.ar.base.rendering.Cube;
+import android.opengl.GLES20;
 
+import org.artoolkit.ar.base.ARToolKit;
+import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
+import org.artoolkit.ar.base.rendering.gles20.CubeGLES20;
+import org.artoolkit.ar.base.rendering.gles20.ShaderProgram;
+
+import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+
+import de.dhbw.tigersar.shader.SimpleFragmentShader;
+import de.dhbw.tigersar.shader.SimpleShaderProgram;
+import de.dhbw.tigersar.shader.SimpleVertexShader;
 
 /**
  * A very simple Renderer that adds a marker and draws a cube on it.
  */
-public class TigersARRenderer extends ARRenderer {
+public class TigersARRenderer extends ARRendererGLES20 {
 
     private int markerID = -1;
-    private Cube cube = new Cube(40.0f, 0.0f, 0.0f, 20.0f);
+    private CubeGLES20 cube;
 
     /**
-     * Markers can be configured here.
+     * This method gets called from the framework to setup the ARScene.
+     * So this is the best spot to configure you assets for your AR app.
+     * For example register used markers in here.
      */
     @Override
     public boolean configureARScene() {
-
         markerID = ARToolKit.getInstance().addMarker("single;Data/hiro.patt;80");
         if (markerID < 0) return false;
 
         return true;
     }
 
+    //Shader calls should be within a GL thread that is onSurfaceChanged(), onSurfaceCreated() or onDrawFrame()
+    //As the cube instantiates the shader during setShaderProgram call we need to create the cube here.
+    @Override
+    public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+        super.onSurfaceCreated(unused, config);
+
+        ShaderProgram shaderProgram = new SimpleShaderProgram(new SimpleVertexShader(), new SimpleFragmentShader());
+        cube = new CubeGLES20(40.0f, 0.0f, 0.0f, 20.0f);
+        cube.setShaderProgram(shaderProgram);
+    }
+
     /**
-     * Override the draw function from ARRenderer.
+     * Override the render function from {@link ARRendererGLES20}.
      */
     @Override
-    public void draw(GL10 gl) {
+    public void draw() {
+        super.draw();
 
-        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        GLES20.glEnable(GLES20.GL_CULL_FACE);
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        GLES20.glFrontFace(GLES20.GL_CW);
 
-        // Apply the ARToolKit projection matrix
-        gl.glMatrixMode(GL10.GL_PROJECTION);
-        gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
+        float[] projectionMatrix = ARToolKit.getInstance().getProjectionMatrix();
 
-        gl.glEnable(GL10.GL_CULL_FACE);
-        gl.glShadeModel(GL10.GL_SMOOTH);
-        gl.glEnable(GL10.GL_DEPTH_TEST);
-        gl.glFrontFace(GL10.GL_CW);
-
-        // If the marker is visible, apply its transformation, and draw a cube
+        // If the marker is visible, apply its transformation, and render a cube
         if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
-            gl.glMatrixMode(GL10.GL_MODELVIEW);
-            gl.glLoadMatrixf(ARToolKit.getInstance().queryMarkerTransformation(markerID), 0);
-            cube.draw(gl);
+            cube.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerID));
         }
-
     }
 }

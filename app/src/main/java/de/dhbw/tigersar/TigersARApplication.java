@@ -5,7 +5,7 @@ import android.app.Application;
 import org.artoolkit.ar.base.assets.AssetHelper;
 
 /**
- * Created by lukas on 09.11.16.
+ * Created by Lukas Schmierer on 09.11.16.
  */
 
 public class TigersARApplication extends Application {

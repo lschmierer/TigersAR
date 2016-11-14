@@ -4,15 +4,11 @@ import android.opengl.GLES20;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
-import org.artoolkit.ar.base.rendering.gles20.CubeGLES20;
-import org.artoolkit.ar.base.rendering.gles20.ShaderProgram;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import de.dhbw.tigersar.shader.SimpleFragmentShader;
-import de.dhbw.tigersar.shader.SimpleShaderProgram;
-import de.dhbw.tigersar.shader.SimpleVertexShader;
+import de.dhbw.tigersar.render.Line;
 
 /**
  * A very simple Renderer that adds a marker and draws a cube on it.
@@ -20,7 +16,7 @@ import de.dhbw.tigersar.shader.SimpleVertexShader;
 public class TigersARRenderer extends ARRendererGLES20 {
 
     private int markerID = -1;
-    private CubeGLES20 cube;
+    private Line line;
 
     /**
      * This method gets called from the framework to setup the ARScene.
@@ -41,9 +37,10 @@ public class TigersARRenderer extends ARRendererGLES20 {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         super.onSurfaceCreated(unused, config);
 
-        ShaderProgram shaderProgram = new SimpleShaderProgram(new SimpleVertexShader(), new SimpleFragmentShader());
-        cube = new CubeGLES20(40.0f, 0.0f, 0.0f, 20.0f);
-        cube.setShaderProgram(shaderProgram);
+        line = new Line(10);
+        line.setStart(new float[]{0, 0, 0});
+        line.setEnd(new float[]{0, 0, 100});
+        line.setColor(new float[]{0.3f, 0.3f, 0.8f, 1f});
     }
 
     /**
@@ -61,7 +58,7 @@ public class TigersARRenderer extends ARRendererGLES20 {
 
         // If the marker is visible, apply its transformation, and render a cube
         if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
-            cube.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerID));
+            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerID));
         }
     }
 }

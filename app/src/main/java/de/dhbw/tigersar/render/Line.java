@@ -1,7 +1,6 @@
 package de.dhbw.tigersar.render;
 
 import android.opengl.GLES20;
-import android.util.Log;
 
 import org.artoolkit.ar.base.rendering.gles20.BaseFragmentShader;
 import org.artoolkit.ar.base.rendering.gles20.BaseShaderProgram;
@@ -12,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 /**
- * Created by lukas on 14.11.16.
+ * Created by Lukas Schmierer on 14.11.16.
  */
 public class Line extends LineGLES20 {
 
@@ -27,7 +26,7 @@ public class Line extends LineGLES20 {
     @Override
     public void setWidth(float width) {
         super.setWidth(width);
-        if(shaderProgram != null)
+        if (shaderProgram != null)
             shaderProgram.setLineWidth((int) width);
     }
 

@@ -15,7 +15,12 @@ import de.dhbw.tigersar.render.Line;
  */
 public class TigersARRenderer extends ARRendererGLES20 {
 
-    private int markerID = -1;
+    private int markerO = -1;
+    private int markerOL = -1;
+    private int markerOR = -1;
+    private int markerU = -1;
+    private int markerUL = -1;
+    private int markerUR = -1;
     private Line line;
 
     /**
@@ -25,8 +30,23 @@ public class TigersARRenderer extends ARRendererGLES20 {
      */
     @Override
     public boolean configureARScene() {
-        markerID = ARToolKit.getInstance().addMarker("single;Data/hiro.patt;80");
-        if (markerID < 0) return false;
+        markerO = ARToolKit.getInstance().addMarker("single;Data/o.patt;80");
+        if (markerO < 0) return false;
+
+        markerOL = ARToolKit.getInstance().addMarker("single;Data/ol.patt;80");
+        if (markerOL < 0) return false;
+
+        markerOR = ARToolKit.getInstance().addMarker("single;Data/or.patt;80");
+        if (markerOR < 0) return false;
+
+        markerU = ARToolKit.getInstance().addMarker("single;Data/u.patt;80");
+        if (markerU < 0) return false;
+
+        markerUL = ARToolKit.getInstance().addMarker("single;Data/ul.patt;80");
+        if (markerUL < 0) return false;
+
+        markerUR = ARToolKit.getInstance().addMarker("single;Data/ur.patt;80");
+        if (markerUR < 0) return false;
 
         return true;
     }
@@ -57,8 +77,28 @@ public class TigersARRenderer extends ARRendererGLES20 {
         float[] projectionMatrix = ARToolKit.getInstance().getProjectionMatrix();
 
         // If the marker is visible, apply its transformation, and render a cube
-        if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
-            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerID));
+        if (ARToolKit.getInstance().queryMarkerVisible(markerO)) {
+            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerO));
+        }
+
+        if (ARToolKit.getInstance().queryMarkerVisible(markerOL)) {
+            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerOL));
+        }
+
+        if (ARToolKit.getInstance().queryMarkerVisible(markerOR)) {
+            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerOR));
+        }
+
+        if (ARToolKit.getInstance().queryMarkerVisible(markerU)) {
+            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerU));
+        }
+
+        if (ARToolKit.getInstance().queryMarkerVisible(markerUL)) {
+            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerUL));
+        }
+
+        if (ARToolKit.getInstance().queryMarkerVisible(markerUR)) {
+            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerUR));
         }
     }
 }

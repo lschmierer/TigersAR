@@ -1,6 +1,7 @@
 package de.dhbw.tigersar;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
@@ -30,22 +31,22 @@ public class TigersARRenderer extends ARRendererGLES20 {
      */
     @Override
     public boolean configureARScene() {
-        markerO = ARToolKit.getInstance().addMarker("single;Data/o.patt;80");
+        markerO = ARToolKit.getInstance().addMarker("single;Data/o.patt;200");
         if (markerO < 0) return false;
 
-        markerOL = ARToolKit.getInstance().addMarker("single;Data/ol.patt;80");
+        markerOL = ARToolKit.getInstance().addMarker("single;Data/ol.patt;200");
         if (markerOL < 0) return false;
 
-        markerOR = ARToolKit.getInstance().addMarker("single;Data/or.patt;80");
+        markerOR = ARToolKit.getInstance().addMarker("single;Data/or.patt;200");
         if (markerOR < 0) return false;
 
-        markerU = ARToolKit.getInstance().addMarker("single;Data/u.patt;80");
+        markerU = ARToolKit.getInstance().addMarker("single;Data/u.patt;200");
         if (markerU < 0) return false;
 
-        markerUL = ARToolKit.getInstance().addMarker("single;Data/ul.patt;80");
+        markerUL = ARToolKit.getInstance().addMarker("single;Data/ul.patt;200");
         if (markerUL < 0) return false;
 
-        markerUR = ARToolKit.getInstance().addMarker("single;Data/ur.patt;80");
+        markerUR = ARToolKit.getInstance().addMarker("single;Data/ur.patt;200");
         if (markerUR < 0) return false;
 
         return true;
@@ -59,7 +60,7 @@ public class TigersARRenderer extends ARRendererGLES20 {
 
         line = new Line(10);
         line.setStart(new float[]{0, 0, 0});
-        line.setEnd(new float[]{0, 0, 100});
+        line.setEnd(new float[]{1000, 0, 0});
         line.setColor(new float[]{0.3f, 0.3f, 0.8f, 1f});
     }
 
@@ -78,11 +79,15 @@ public class TigersARRenderer extends ARRendererGLES20 {
 
         // If the marker is visible, apply its transformation, and render a cube
         if (ARToolKit.getInstance().queryMarkerVisible(markerO)) {
-            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerO));
+            float[] modelViewMatrix = ARToolKit.getInstance().queryMarkerTransformation(markerO);
+            Matrix.rotateM(modelViewMatrix, 0, 90f, 0f, 0f, 1f);
+            line.draw(projectionMatrix, modelViewMatrix);
         }
 
         if (ARToolKit.getInstance().queryMarkerVisible(markerOL)) {
-            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerOL));
+            float[] modelViewMatrix = ARToolKit.getInstance().queryMarkerTransformation(markerOL);
+            Matrix.rotateM(modelViewMatrix, 0, 90f, 0f, 0f, 1f);
+            line.draw(projectionMatrix, modelViewMatrix);
         }
 
         if (ARToolKit.getInstance().queryMarkerVisible(markerOR)) {
@@ -90,7 +95,9 @@ public class TigersARRenderer extends ARRendererGLES20 {
         }
 
         if (ARToolKit.getInstance().queryMarkerVisible(markerU)) {
-            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerU));
+            float[] modelViewMatrix = ARToolKit.getInstance().queryMarkerTransformation(markerU);
+            Matrix.rotateM(modelViewMatrix, 0, 90f, 0f, 0f, 1f);
+            line.draw(projectionMatrix, modelViewMatrix);
         }
 
         if (ARToolKit.getInstance().queryMarkerVisible(markerUL)) {

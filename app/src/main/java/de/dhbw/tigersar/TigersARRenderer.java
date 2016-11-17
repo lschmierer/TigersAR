@@ -9,6 +9,7 @@ import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import de.dhbw.tigersar.render.Field;
 import de.dhbw.tigersar.render.Line;
 import de.dhbw.tigersar.tracking.ARException;
 import de.dhbw.tigersar.tracking.SquareMarker;
@@ -24,6 +25,8 @@ public class TigersARRenderer extends ARRendererGLES20 {
     private SquareMarker markerU;
     private SquareMarker markerUL;
     private SquareMarker markerUR;
+
+    private Field field;
     private Line line;
 
     /**
@@ -53,6 +56,7 @@ public class TigersARRenderer extends ARRendererGLES20 {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         super.onSurfaceCreated(unused, config);
 
+        field = new Field(1600, 800);
         line = new Line(10);
         line.setStart(new float[]{0, 0, 0});
         line.setEnd(new float[]{1000, 0, 0});
@@ -75,7 +79,7 @@ public class TigersARRenderer extends ARRendererGLES20 {
         // If the marker is visible, apply its transformation, and render a cube
         try {
             if (markerO.isVisible()) {
-                line.draw(projectionMatrix, markerO.getTransformation());
+                field.draw(projectionMatrix, markerO.getTransformation());
             }
             if (markerOL.isVisible()) {
                 line.draw(projectionMatrix, markerOL.getTransformation());

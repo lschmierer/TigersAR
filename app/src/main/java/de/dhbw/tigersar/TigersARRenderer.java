@@ -10,18 +10,20 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import de.dhbw.tigersar.render.Line;
+import de.dhbw.tigersar.tracking.ARException;
+import de.dhbw.tigersar.tracking.SquareMarker;
 
 /**
  * A very simple Renderer that adds a marker and draws a cube on it.
  */
 public class TigersARRenderer extends ARRendererGLES20 {
 
-    private int markerO = -1;
-    private int markerOL = -1;
-    private int markerOR = -1;
-    private int markerU = -1;
-    private int markerUL = -1;
-    private int markerUR = -1;
+    private SquareMarker markerO;
+    private SquareMarker markerOL;
+    private SquareMarker markerOR;
+    private SquareMarker markerU;
+    private SquareMarker markerUL;
+    private SquareMarker markerUR;
     private Line line;
 
     /**
@@ -31,23 +33,16 @@ public class TigersARRenderer extends ARRendererGLES20 {
      */
     @Override
     public boolean configureARScene() {
-        markerO = ARToolKit.getInstance().addMarker("single;Data/o.patt;200");
-        if (markerO < 0) return false;
-
-        markerOL = ARToolKit.getInstance().addMarker("single;Data/ol.patt;200");
-        if (markerOL < 0) return false;
-
-        markerOR = ARToolKit.getInstance().addMarker("single;Data/or.patt;200");
-        if (markerOR < 0) return false;
-
-        markerU = ARToolKit.getInstance().addMarker("single;Data/u.patt;200");
-        if (markerU < 0) return false;
-
-        markerUL = ARToolKit.getInstance().addMarker("single;Data/ul.patt;200");
-        if (markerUL < 0) return false;
-
-        markerUR = ARToolKit.getInstance().addMarker("single;Data/ur.patt;200");
-        if (markerUR < 0) return false;
+        try {
+            markerO = new SquareMarker("Data/o.patt", 200, 90);
+            markerOL = new SquareMarker("Data/ol.patt", 200, 90);
+            markerOR = new SquareMarker("Data/or.patt", 200);
+            markerU = new SquareMarker("Data/u.patt", 200, 90);
+            markerUL = new SquareMarker("Data/ul.patt", 200);
+            markerUR = new SquareMarker("Data/ur.patt", 200);
+        } catch (ARException e) {
+            e.printStackTrace();
+        }
 
         return true;
     }
@@ -78,34 +73,27 @@ public class TigersARRenderer extends ARRendererGLES20 {
         float[] projectionMatrix = ARToolKit.getInstance().getProjectionMatrix();
 
         // If the marker is visible, apply its transformation, and render a cube
-        if (ARToolKit.getInstance().queryMarkerVisible(markerO)) {
-            float[] modelViewMatrix = ARToolKit.getInstance().queryMarkerTransformation(markerO);
-            Matrix.rotateM(modelViewMatrix, 0, 90f, 0f, 0f, 1f);
-            line.draw(projectionMatrix, modelViewMatrix);
-        }
-
-        if (ARToolKit.getInstance().queryMarkerVisible(markerOL)) {
-            float[] modelViewMatrix = ARToolKit.getInstance().queryMarkerTransformation(markerOL);
-            Matrix.rotateM(modelViewMatrix, 0, 90f, 0f, 0f, 1f);
-            line.draw(projectionMatrix, modelViewMatrix);
-        }
-
-        if (ARToolKit.getInstance().queryMarkerVisible(markerOR)) {
-            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerOR));
-        }
-
-        if (ARToolKit.getInstance().queryMarkerVisible(markerU)) {
-            float[] modelViewMatrix = ARToolKit.getInstance().queryMarkerTransformation(markerU);
-            Matrix.rotateM(modelViewMatrix, 0, 90f, 0f, 0f, 1f);
-            line.draw(projectionMatrix, modelViewMatrix);
-        }
-
-        if (ARToolKit.getInstance().queryMarkerVisible(markerUL)) {
-            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerUL));
-        }
-
-        if (ARToolKit.getInstance().queryMarkerVisible(markerUR)) {
-            line.draw(projectionMatrix, ARToolKit.getInstance().queryMarkerTransformation(markerUR));
+        try {
+            if (markerO.isVisible()) {
+                line.draw(projectionMatrix, markerO.getTransformation());
+            }
+            if (markerOL.isVisible()) {
+                line.draw(projectionMatrix, markerOL.getTransformation());
+            }
+            if (markerOR.isVisible()) {
+                line.draw(projectionMatrix, markerOR.getTransformation());
+            }
+            if (markerU.isVisible()) {
+                line.draw(projectionMatrix, markerU.getTransformation());
+            }
+            if (markerUL.isVisible()) {
+                line.draw(projectionMatrix, markerUL.getTransformation());
+            }
+            if (markerUR.isVisible()) {
+                line.draw(projectionMatrix, markerUR.getTransformation());
+            }
+        } catch (ARException e) {
+            e.printStackTrace();
         }
     }
 }

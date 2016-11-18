@@ -30,7 +30,12 @@ public class TigersARRenderer extends ARRendererGLES20 {
     public boolean configureARScene() {
         try {
             fieldCenterEstimator = new FieldCenterEstimator(1200, 600);
-            fieldCenterEstimator.setOffest(MarkerPosition.O, new float[]{0, 200});
+            fieldCenterEstimator.setOffest(MarkerPosition.O, new float[]{0, 150});
+            fieldCenterEstimator.setOffest(MarkerPosition.OL, new float[]{-150, 150});
+            fieldCenterEstimator.setOffest(MarkerPosition.OR, new float[]{150, 150});
+            fieldCenterEstimator.setOffest(MarkerPosition.U, new float[]{0, -150});
+            fieldCenterEstimator.setOffest(MarkerPosition.UL, new float[]{-150, -150});
+            fieldCenterEstimator.setOffest(MarkerPosition.UR, new float[]{150, -150});
         } catch (ARException e) {
             return false;
         }

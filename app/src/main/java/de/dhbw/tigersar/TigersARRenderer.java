@@ -60,7 +60,9 @@ public class TigersARRenderer extends ARRendererGLES20 {
         float[] projectionMatrix = ARToolKit.getInstance().getProjectionMatrix();
 
         try {
-            field.draw(projectionMatrix, fieldCenterEstimator.calculateCenterTransform());
+            if (fieldCenterEstimator.isVisible()) {
+                field.draw(projectionMatrix, fieldCenterEstimator.calculateCenterTransform());
+            }
         } catch (ARException e) {
             e.printStackTrace();
         }

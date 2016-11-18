@@ -9,7 +9,7 @@ import org.artoolkit.ar.base.ARToolKit;
  * <p>
  * Class representing a square marker that can be loaded from file.
  */
-public class SquareMarker {
+public class SquareMarker implements Marker {
 
     private int markerId = -1;
     private float rotDeg;
@@ -26,10 +26,12 @@ public class SquareMarker {
         this(filePath, markerSize, 0);
     }
 
+    @Override
     public boolean isVisible() {
         return ARToolKit.getInstance().queryMarkerVisible(markerId);
     }
 
+    @Override
     public float[] getTransformation() throws ARException {
         if (!isVisible()) {
             throw new ARException("Marker not visible");

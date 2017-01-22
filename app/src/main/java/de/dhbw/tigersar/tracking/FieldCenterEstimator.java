@@ -49,11 +49,24 @@ public class FieldCenterEstimator {
     }
 
     public float[] calculateCenterTransform() throws ARException {
-        // TODO estimate center from all visible markers
-
         List<float[]> markerCenterTransformations = calculateAllMarkersCenterTransforms();
         if (!markerCenterTransformations.isEmpty()) {
-            return markerCenterTransformations.get(0);
+            float[] finalTransform = markerCenterTransformations.get(0);
+
+            int count = markerCenterTransformations.size();
+
+            for (int i = 1; i < count; i++) {
+                float[] transform = markerCenterTransformations.get(i);
+                finalTransform[12] += transform[12];
+                finalTransform[13] += transform[13];
+                finalTransform[14] += transform[14];
+            }
+
+            finalTransform[12] /= count;
+            finalTransform[13] /= count;
+            finalTransform[14] /= count;
+
+            return finalTransform;
         }
         return null;
     }

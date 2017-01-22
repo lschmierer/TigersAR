@@ -1,6 +1,7 @@
 package de.dhbw.tigersar;
 
 import android.app.Application;
+import android.preference.PreferenceManager;
 
 import org.artoolkit.ar.base.assets.AssetHelper;
 
@@ -23,6 +24,8 @@ public class TigersARApplication extends Application {
         super.onCreate();
         sInstance = this;
         sInstance.initializeInstance();
+        PreferenceManager.setDefaultValues(this, org.artoolkit.ar.base.R.xml.preferences, false);
+
     }
 
     // Here we do one-off initialisation which should apply to all activities

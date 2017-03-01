@@ -12,6 +12,7 @@ import java.util.List;
 public class Field implements Renderable {
 
     private List<Line> lines;
+    private Circle centerCircle;
 
     public Field(int width, int height) {
         lines = new ArrayList<>(5);
@@ -29,6 +30,9 @@ public class Field implements Renderable {
         for (Line line : lines) {
             line.setColor(new float[]{1f, 1f, 1f, 1f});
         }
+
+        centerCircle = new Circle(new float[]{0, 0, 0}, 25, true);
+        centerCircle.setColor(new float[]{1f, 1f, 1f, 1f});
     }
 
     @Override
@@ -36,5 +40,6 @@ public class Field implements Renderable {
         for (Line line : lines) {
             line.draw(projectionMatrix, modelViewMatrix);
         }
+        centerCircle.draw(projectionMatrix, modelViewMatrix);
     }
 }

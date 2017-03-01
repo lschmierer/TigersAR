@@ -17,20 +17,16 @@ public class Line implements Renderable {
 
     private float[] start = new float[3];
     private float[] end = new float[3];
-    private float width;
-    private float[] color = new float[]{1.0f, 0.0f, 0.0f, 1.0f};
+    private int width;
+    private float[] color = new float[]{1f, 0, 0, 1f};
 
     private LineShaderProgram mShaderProgram;
     private FloatBuffer mVertexBuffer;
     private FloatBuffer mColorBuffer;
 
-    public Line(float width) {
+    public Line(int width, float[] start, float[] end) {
+        mShaderProgram = new LineShaderProgram(width);
         setWidth(width);
-        mShaderProgram = new LineShaderProgram((int) width);
-    }
-
-    public Line(float width, float[] start, float[] end) {
-        this(width);
         setStart(start);
         setEnd(end);
     }
@@ -43,7 +39,7 @@ public class Line implements Renderable {
         if (start.length == 2) {
             this.start[0] = start[0];
             this.start[1] = start[1];
-        } else if (start.length == 3) {
+        } else {
             this.start = start;
         }
     }
@@ -56,19 +52,19 @@ public class Line implements Renderable {
         if (end.length == 2) {
             this.end[0] = end[0];
             this.end[1] = end[1];
-        } else if (end.length == 3) {
+        } else {
             this.end = end;
         }
     }
 
-    public float getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public void setWidth(float width) {
+    public void setWidth(int width) {
         this.width = width;
         if (mShaderProgram != null)
-            mShaderProgram.setLineWidth((int) width);
+            mShaderProgram.setLineWidth(width);
     }
 
     public float[] getColor() {

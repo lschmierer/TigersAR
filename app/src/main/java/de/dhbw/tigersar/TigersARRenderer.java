@@ -60,7 +60,7 @@ public class TigersARRenderer extends ARRendererGLES20 {
 
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-        GLES20.glFrontFace(GLES20.GL_CW);
+        GLES20.glFrontFace(GLES20.GL_CCW);
 
         float[] projectionMatrix = ARToolKit.getInstance().getProjectionMatrix();
 

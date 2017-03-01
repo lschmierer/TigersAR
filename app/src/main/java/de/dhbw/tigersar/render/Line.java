@@ -6,7 +6,6 @@ import org.artoolkit.ar.base.rendering.RenderUtils;
 import org.artoolkit.ar.base.rendering.gles20.BaseFragmentShader;
 import org.artoolkit.ar.base.rendering.gles20.BaseShaderProgram;
 import org.artoolkit.ar.base.rendering.gles20.BaseVertexShader;
-import org.artoolkit.ar.base.rendering.gles20.LineGLES20;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -14,15 +13,20 @@ import java.nio.FloatBuffer;
 /**
  * Created by Lukas Schmierer on 14.11.16.
  */
-public class Line extends LineGLES20 implements Renderable {
+public class Line implements Renderable {
 
-    private LineShaderProgram shaderProgram;
+    private float[] start = new float[3];
+    private float[] end = new float[3];
+    private float width;
+    private float[] color = new float[]{1.0f, 0.0f, 0.0f, 1.0f};
+
+    private LineShaderProgram mShaderProgram;
     private FloatBuffer mVertexBuffer;
+    private FloatBuffer mColorBuffer;
 
     public Line(float width) {
-        super(width);
-        shaderProgram = new LineShaderProgram((int) width);
-        setShaderProgram(shaderProgram);
+        setWidth(width);
+        mShaderProgram = new LineShaderProgram((int) width);
     }
 
     public Line(float width, float[] start, float[] end) {
@@ -31,28 +35,67 @@ public class Line extends LineGLES20 implements Renderable {
         setEnd(end);
     }
 
-    @Override
-    protected void setArrays() {
-        super.setArrays();
+    public float[] getStart() {
+        return start;
+    }
+
+    public void setStart(float[] start) {
+        if (start.length == 2) {
+            this.start[0] = start[0];
+            this.start[1] = start[1];
+        } else if (start.length == 3) {
+            this.start = start;
+        }
+    }
+
+    public float[] getEnd() {
+        return end;
+    }
+
+    public void setEnd(float[] end) {
+        if (end.length == 2) {
+            this.end[0] = end[0];
+            this.end[1] = end[1];
+        } else if (end.length == 3) {
+            this.end = end;
+        }
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+        if (mShaderProgram != null)
+            mShaderProgram.setLineWidth((int) width);
+    }
+
+    public float[] getColor() {
+        return this.color;
+    }
+
+    public void setColor(float[] color) {
+        this.color = color;
+    }
+
+    private void setArrays() {
         float[] vertices = new float[6];
 
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             vertices[i] = getStart()[i];
             vertices[i + 3] = getEnd()[i];
         }
-        this.mVertexBuffer = RenderUtils.buildFloatBuffer(vertices);
+        mVertexBuffer = RenderUtils.buildFloatBuffer(vertices);
+        mColorBuffer = RenderUtils.buildFloatBuffer(this.color);
+
     }
 
-    @Override
-    public void setWidth(float width) {
-        super.setWidth(width);
-        if (shaderProgram != null)
-            shaderProgram.setLineWidth((int) width);
-    }
-
-    @Override
-    public FloatBuffer getMVertexBuffer() {
-        return this.mVertexBuffer;
+    public void draw(float[] projectionMatrix, float[] modelViewMatrix) {
+        mShaderProgram.setProjectionMatrix(projectionMatrix);
+        mShaderProgram.setModelViewMatrix(modelViewMatrix);
+        setArrays();
+        mShaderProgram.render(mVertexBuffer, mColorBuffer, null);
     }
 
     private static class LineFragmentShader extends BaseFragmentShader {

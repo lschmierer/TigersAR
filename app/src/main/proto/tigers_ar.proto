@@ -1,0 +1,40 @@
+package tigersar;
+
+option java_package = "de.dhwb.tigersar";
+option java_outer_classname = "TigersARProtos";
+
+message ARMessage {
+    required uint64 timestamp = 1;
+    required Field field = 2;
+    repeated Line lines = 3;
+    repeated Circle circles = 4;
+}
+
+message Field {
+    required int32 width = 1;
+    required int32 height = 2;
+}
+
+message Line {
+    required Vector start = 1;
+    required Vector end = 2;
+    required Color color = 3;
+}
+
+message Circle {
+    required Vector position = 1;
+    required float radius = 2;
+    required Color color = 3;
+    optional Color fillColor = 4;
+}
+
+message Vector {
+    required float x = 1;
+    required float y = 2;
+}
+
+message Color {
+    required int32 r = 1;
+    required int32 g = 2;
+    required int32 b = 3;
+}

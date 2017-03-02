@@ -11,7 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/aRBaseLib" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/protobuf" />
+            <option value="$PROJECT_DIR$/tigersARProtos" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

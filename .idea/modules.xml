@@ -5,7 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/TigersAR.iml" filepath="$PROJECT_DIR$/TigersAR.iml" />
       <module fileurl="file://$PROJECT_DIR$/aRBaseLib/aRBaseLib.iml" filepath="$PROJECT_DIR$/aRBaseLib/aRBaseLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/protobuf/protobuf.iml" filepath="$PROJECT_DIR$/protobuf/protobuf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tigersARProtos/tigersARProtos.iml" filepath="$PROJECT_DIR$/tigersARProtos/tigersARProtos.iml" />
     </modules>
   </component>
 </project>

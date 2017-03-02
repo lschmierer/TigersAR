@@ -3,6 +3,7 @@ package de.dhbw.tigersar;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,18 @@ import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.camera.CameraPreferencesActivity;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
+import java.io.IOException;
+import java.net.InetAddress;
+
+import de.dhbw.tigersar.net.TigersARMulticastClient;
+import de.dhwb.tigersar.TigersARProtos;
+
 public class MainActivity extends ARActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     private static final float MAIN_LAYOUT_ASPECT_RATIO = 4 / 3f;
+    private TigersARMulticastClient mARMulticastClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,6 +39,26 @@ public class MainActivity extends ARActivity {
         layoutParams.height = mainLayoutSize.y;
         mainLayout.setLayoutParams(layoutParams);
 
+        try {
+            mARMulticastClient = new TigersARMulticastClient(InetAddress.getByName("225.225.125.225"), 25225);
+
+            mARMulticastClient.setCallback(new TigersARMulticastClient.OnNewMessageCallback() {
+                @Override
+                public void onNewMessage(TigersARProtos.ARMessage message) {
+                    Log.d(TAG, "New ARMessage: " + message);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Thread clientThread = new Thread(mARMulticastClient);
+        clientThread.start();
     }
 
     @Override
@@ -57,5 +87,11 @@ public class MainActivity extends ARActivity {
         } else {
             return new Point(Math.round(MAIN_LAYOUT_ASPECT_RATIO * height), height);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mARMulticastClient.stop();
     }
 }

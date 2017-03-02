@@ -1,1 +1,1 @@
-include ':app', ':aRBaseLib', ':protobuf'
+include ':app', ':aRBaseLib', ':tigersARProtos'

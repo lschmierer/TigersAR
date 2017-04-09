@@ -5,21 +5,27 @@ import android.opengl.GLES20;
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
+import java.util.ArrayList;
+import java.util.List;
 
+import de.dhbw.tigersar.render.Circle;
 import de.dhbw.tigersar.render.Field;
+import de.dhbw.tigersar.render.Line;
 import de.dhbw.tigersar.tracking.ARException;
 import de.dhbw.tigersar.tracking.FieldCenterEstimator;
 import de.dhbw.tigersar.tracking.MarkerPosition;
+import de.dhwb.tigersar.TigersARProtos;
 
 /**
  * A very simple Renderer that adds a marker and draws a cube on it.
  */
 public class TigersARRenderer extends ARRendererGLES20 {
 
-    private Field field;
+    TigersARProtos.ARMessage arMessage;
     private FieldCenterEstimator fieldCenterEstimator;
+    private Field field;
+    private List<Line> lines;
+    private List<Circle> circles;
 
     /**
      * This method gets called from the framework to setup the ARScene.
@@ -28,8 +34,10 @@ public class TigersARRenderer extends ARRendererGLES20 {
      */
     @Override
     public boolean configureARScene() {
+        lines = new ArrayList<>();
+        circles = new ArrayList<>();
         try {
-            fieldCenterEstimator = new FieldCenterEstimator(1200, 600);
+            fieldCenterEstimator = new FieldCenterEstimator();
             fieldCenterEstimator.setOffest(MarkerPosition.O, new float[]{0, 150});
             fieldCenterEstimator.setOffest(MarkerPosition.OL, new float[]{-150, 150});
             fieldCenterEstimator.setOffest(MarkerPosition.OR, new float[]{150, 150});
@@ -40,15 +48,6 @@ public class TigersARRenderer extends ARRendererGLES20 {
             return false;
         }
         return true;
-    }
-
-    //Shader calls should be within a GL thread that is onSurfaceChanged(), onSurfaceCreated() or onDrawFrame()
-    //As the cube instantiates the shader during setShaderProgram call we need to create the cube here.
-    @Override
-    public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-        super.onSurfaceCreated(unused, config);
-
-        field = new Field(1200, 600);
     }
 
     /**
@@ -64,12 +63,64 @@ public class TigersARRenderer extends ARRendererGLES20 {
 
         float[] projectionMatrix = ARToolKit.getInstance().getProjectionMatrix();
 
+        createGLObjects();
+
         try {
             if (fieldCenterEstimator.isVisible()) {
-                field.draw(projectionMatrix, fieldCenterEstimator.calculateCenterTransform());
+                if(field != null) {
+                    field.draw(projectionMatrix, fieldCenterEstimator.calculateCenterTransform());
+                }
+                for (Line line : lines) {
+                    line.draw(projectionMatrix, fieldCenterEstimator.calculateCenterTransform());
+                }
+                for (Circle circle : circles) {
+                    circle.draw(projectionMatrix, fieldCenterEstimator.calculateCenterTransform());
+                }
             }
         } catch (ARException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createGLObjects() {
+        if (arMessage == null)
+            return;
+
+        if (arMessage.hasField()) {
+            TigersARProtos.Field arField = arMessage.getField();
+            fieldCenterEstimator.setWidth(arField.getWidth());
+            fieldCenterEstimator.setHeight(arField.getHeight());
+            field = new Field(arField.getWidth(), arField.getHeight());
+        }
+
+        lines.clear();
+        for (TigersARProtos.Line arLine : arMessage.getLinesList()) {
+            lines.add(new Line(8,
+                    new float[]{arLine.getStart().getX(), arLine.getStart().getY()},
+                    new float[]{arLine.getEnd().getX(), arLine.getEnd().getY()}));
+        }
+
+        circles.clear();
+        for (TigersARProtos.Circle arCircle : arMessage.getCirclesList()) {
+            float[] position = new float[]{arCircle.getPosition().getX(), arCircle.getPosition().getY()};
+            if (arCircle.hasFillColor()) {
+                Circle circle = new Circle(position, arCircle.getRadius());
+                circle.setColor(new float[]{
+                        arCircle.getFillColor().getR(),
+                        arCircle.getFillColor().getG(),
+                        arCircle.getFillColor().getB()});
+                circles.add(circle);
+            }
+            Circle circle = new Circle(position, arCircle.getRadius(), 8);
+            circle.setColor(new float[]{
+                    arCircle.getColor().getR(),
+                    arCircle.getColor().getG(),
+                    arCircle.getColor().getB()});
+            circles.add(circle);
+        }
+    }
+
+    public void renderFromARMessage(TigersARProtos.ARMessage arMessage) {
+        this.arMessage = arMessage;
     }
 }

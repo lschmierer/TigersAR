@@ -36,11 +36,11 @@ public class Circle implements Renderable {
     }
 
     public Circle(float[] position, float radius, int lineWidth) {
-        this(position, radius, lineWidth, true);
+        this(position, radius, lineWidth, false);
     }
 
-    public Circle(float[] position, float radius, boolean filled) {
-        this(position, radius, 0, filled);
+    public Circle(float[] position, float radius) {
+        this(position, radius, 0, true);
     }
 
     public float[] getPosition() {

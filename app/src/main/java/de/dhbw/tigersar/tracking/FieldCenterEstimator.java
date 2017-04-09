@@ -15,10 +15,15 @@ import java.util.Map;
 public class FieldCenterEstimator {
 
     private int width;
+
     private int height;
 
     private Map<MarkerPosition, Marker> markers;
     private Map<MarkerPosition, float[]> offsets;
+
+    public FieldCenterEstimator() throws ARException {
+        this(0, 0);
+    }
 
     public FieldCenterEstimator(int width, int height) throws ARException {
         this.width = width;
@@ -33,6 +38,22 @@ public class FieldCenterEstimator {
         markers.put(MarkerPosition.UR, new SquareMarker("Data/ur.patt", 200));
 
         offsets = new HashMap<>(6);
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public void setOffest(MarkerPosition markerPosition, float[] offset) {

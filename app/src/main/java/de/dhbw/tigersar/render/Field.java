@@ -31,7 +31,7 @@ public class Field implements Renderable {
             line.setColor(new float[]{1f, 1f, 1f, 1f});
         }
 
-        centerCircle = new Circle(new float[]{0, 0, 0}, 25, true);
+        centerCircle = new Circle(new float[]{0, 0, 0}, 25);
         centerCircle.setColor(new float[]{1f, 1f, 1f, 1f});
     }
 

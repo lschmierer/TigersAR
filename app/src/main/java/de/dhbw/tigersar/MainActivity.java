@@ -1,7 +1,9 @@
 package de.dhbw.tigersar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -24,7 +26,9 @@ public class MainActivity extends ARActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final float MAIN_LAYOUT_ASPECT_RATIO = 4 / 3f;
+    private TigersARRenderer mARRenderer;
     private TigersARMulticastClient mARMulticastClient;
+    private WifiManager.MulticastLock mMulticastLock;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,13 +43,21 @@ public class MainActivity extends ARActivity {
         layoutParams.height = mainLayoutSize.y;
         mainLayout.setLayoutParams(layoutParams);
 
+        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifi != null) {
+            mMulticastLock = wifi.createMulticastLock("TigersARLock");
+        }
+
         try {
             mARMulticastClient = new TigersARMulticastClient(InetAddress.getByName("225.225.125.225"), 25225);
 
             mARMulticastClient.setCallback(new TigersARMulticastClient.OnNewMessageCallback() {
                 @Override
                 public void onNewMessage(TigersARProtos.ARMessage message) {
-                    Log.d(TAG, "New ARMessage: " + message);
+                    Log.d(TAG, "new ARMessage received");
+                    if(mARRenderer != null) {
+                        mARRenderer.renderFromARMessage(message);
+                    }
                 }
             });
         } catch (IOException e) {
@@ -57,13 +69,18 @@ public class MainActivity extends ARActivity {
     public void onResume() {
         super.onResume();
 
-        Thread clientThread = new Thread(mARMulticastClient);
-        clientThread.start();
+        if(mMulticastLock != null) {
+            mMulticastLock.acquire();
+
+            Thread clientThread = new Thread(mARMulticastClient);
+            clientThread.start();
+        }
     }
 
     @Override
     protected ARRenderer supplyRenderer() {
-        return new TigersARRenderer();
+        mARRenderer = new TigersARRenderer();
+        return mARRenderer;
     }
 
     @Override
@@ -93,5 +110,8 @@ public class MainActivity extends ARActivity {
     protected void onPause() {
         super.onPause();
         mARMulticastClient.stop();
+        if (mMulticastLock != null) {
+            mMulticastLock.release();
+        }
     }
 }

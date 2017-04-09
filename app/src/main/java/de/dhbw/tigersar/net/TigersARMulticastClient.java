@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 import de.dhwb.tigersar.TigersARProtos;
 
@@ -32,6 +35,7 @@ public class TigersARMulticastClient implements Runnable {
     public TigersARMulticastClient(InetAddress group, int port) throws IOException {
         this.group = group;
         socket = new MulticastSocket(port);
+        socket.setNetworkInterface(getWlanEth());
         socket.joinGroup(group);
         Log.d(TAG, "Multicast client created");
     }
@@ -95,5 +99,19 @@ public class TigersARMulticastClient implements Runnable {
     public void stop() {
         Log.d(TAG, "Multicast client stopping...");
         running = false;
+    }
+
+    public static NetworkInterface getWlanEth() throws SocketException {
+        Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
+        NetworkInterface wlan0;
+        while (enumeration.hasMoreElements()) {
+            wlan0 = enumeration.nextElement();
+            if (wlan0.getName().equals("wlan0")) {
+                Log.i(TAG, "wlan0 found");
+                return wlan0;
+            }
+        }
+
+        return null;
     }
 }

@@ -23,12 +23,13 @@ public class Circle implements Renderable {
     private float[] color = new float[]{1f, 0, 0, 1f};
     private boolean filled;
 
-    private CircleShaderProgram mShaderProgram;
+    private static CircleShaderProgram mShaderProgram;
     private FloatBuffer mVertexBuffer;
     private FloatBuffer mColorBuffer;
 
     public Circle(float[] position, float radius, int lineWidth, boolean filled) {
-        mShaderProgram = new CircleShaderProgram(lineWidth);
+        if(mShaderProgram == null)
+            mShaderProgram = new CircleShaderProgram(lineWidth);
         setPosition(position);
         setRadius(radius);
         setLineWidth(lineWidth);
@@ -70,8 +71,6 @@ public class Circle implements Renderable {
 
     public void setLineWidth(int lineWidth) {
         this.lineWidth = lineWidth;
-        if (mShaderProgram != null)
-            mShaderProgram.setLineWidth(lineWidth);
     }
 
     public boolean getFilled() {
@@ -80,8 +79,6 @@ public class Circle implements Renderable {
 
     public void setFilled(boolean filled) {
         this.filled = filled;
-        if (mShaderProgram != null)
-            mShaderProgram.setFilled(filled);
     }
 
     public float[] getColor() {
@@ -111,6 +108,9 @@ public class Circle implements Renderable {
     }
 
     public void draw(float[] projectionMatrix, float[] modelViewMatrix) {
+        mShaderProgram.setLineWidth(lineWidth);
+        mShaderProgram.setFilled(filled);
+
         mShaderProgram.setProjectionMatrix(projectionMatrix);
         mShaderProgram.setModelViewMatrix(modelViewMatrix);
         setArrays();

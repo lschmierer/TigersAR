@@ -20,12 +20,13 @@ public class Line implements Renderable {
     private int width;
     private float[] color = new float[]{1f, 0, 0, 1f};
 
-    private LineShaderProgram mShaderProgram;
+    private static LineShaderProgram mShaderProgram;
     private FloatBuffer mVertexBuffer;
     private FloatBuffer mColorBuffer;
 
     public Line(int width, float[] start, float[] end) {
-        mShaderProgram = new LineShaderProgram(width);
+        if(mShaderProgram == null)
+            mShaderProgram = new LineShaderProgram(width);
         setWidth(width);
         setStart(start);
         setEnd(end);
@@ -63,8 +64,6 @@ public class Line implements Renderable {
 
     public void setWidth(int width) {
         this.width = width;
-        if (mShaderProgram != null)
-            mShaderProgram.setLineWidth(width);
     }
 
     public float[] getColor() {
@@ -88,6 +87,8 @@ public class Line implements Renderable {
     }
 
     public void draw(float[] projectionMatrix, float[] modelViewMatrix) {
+        mShaderProgram.setLineWidth(width);
+
         mShaderProgram.setProjectionMatrix(projectionMatrix);
         mShaderProgram.setModelViewMatrix(modelViewMatrix);
         setArrays();

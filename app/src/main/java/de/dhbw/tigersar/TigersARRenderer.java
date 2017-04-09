@@ -22,6 +22,7 @@ import de.dhwb.tigersar.TigersARProtos;
 public class TigersARRenderer extends ARRendererGLES20 {
 
     TigersARProtos.ARMessage arMessage;
+    private boolean messageUpdated;
     private FieldCenterEstimator fieldCenterEstimator;
     private Field field;
     private List<Line> lines;
@@ -63,11 +64,14 @@ public class TigersARRenderer extends ARRendererGLES20 {
 
         float[] projectionMatrix = ARToolKit.getInstance().getProjectionMatrix();
 
-        createGLObjects();
+        if (messageUpdated) {
+            createGLObjects();
+            messageUpdated = false;
+        }
 
         try {
             if (fieldCenterEstimator.isVisible()) {
-                if(field != null) {
+                if (field != null) {
                     field.draw(projectionMatrix, fieldCenterEstimator.calculateCenterTransform());
                 }
                 for (Line line : lines) {
@@ -122,5 +126,6 @@ public class TigersARRenderer extends ARRendererGLES20 {
 
     public void renderFromARMessage(TigersARProtos.ARMessage arMessage) {
         this.arMessage = arMessage;
+        messageUpdated = true;
     }
 }

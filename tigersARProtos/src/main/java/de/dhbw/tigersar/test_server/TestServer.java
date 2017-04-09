@@ -78,7 +78,7 @@ public class TestServer implements Runnable {
         testServerThread.start();
 
         TigersARProtos.Field field = TigersARProtos.Field.newBuilder()
-                .setWidth(600)
+                .setWidth(1200)
                 .setHeight(600)
                 .build();
 
@@ -87,6 +87,7 @@ public class TestServer implements Runnable {
                 .setField(field)
                 .build();
 
+        System.out.println(message);
         testServer.setMessage(message);
 
         for (int i = 3; i > 0; i--) {

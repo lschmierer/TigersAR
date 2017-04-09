@@ -47,34 +47,34 @@ public class MainActivity extends ARActivity {
         if (wifi != null) {
             mMulticastLock = wifi.createMulticastLock("TigersARLock");
         }
+    }
 
-        try {
-            mARMulticastClient = new TigersARMulticastClient(InetAddress.getByName("225.225.125.225"), 25225);
+    @Override
+    public void onResume() {
+        if (mMulticastLock != null) {
+            mMulticastLock.acquire();
+
+            try {
+                mARMulticastClient = new TigersARMulticastClient(InetAddress.getByName("225.225.125.225"), 25225);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             mARMulticastClient.setCallback(new TigersARMulticastClient.OnNewMessageCallback() {
                 @Override
                 public void onNewMessage(TigersARProtos.ARMessage message) {
                     Log.d(TAG, "new ARMessage received");
-                    if(mARRenderer != null) {
+                    if (mARRenderer != null) {
                         mARRenderer.renderFromARMessage(message);
                     }
                 }
             });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if(mMulticastLock != null) {
-            mMulticastLock.acquire();
 
             Thread clientThread = new Thread(mARMulticastClient);
             clientThread.start();
         }
+
+        super.onResume();
     }
 
     @Override
@@ -110,6 +110,7 @@ public class MainActivity extends ARActivity {
     protected void onPause() {
         super.onPause();
         mARMulticastClient.stop();
+        mARMulticastClient = null;
         if (mMulticastLock != null) {
             mMulticastLock.release();
         }

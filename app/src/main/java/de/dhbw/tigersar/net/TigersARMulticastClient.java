@@ -36,7 +36,6 @@ public class TigersARMulticastClient implements Runnable {
         this.group = group;
         socket = new MulticastSocket(port);
         socket.setNetworkInterface(getWlanEth());
-        socket.joinGroup(group);
         Log.d(TAG, "Multicast client created");
     }
 
@@ -45,31 +44,39 @@ public class TigersARMulticastClient implements Runnable {
     }
 
     public void setCallback(OnNewMessageCallback callback) {
+        Log.d(TAG, "callback set");
         this.callback = callback;
     }
 
     @Override
     public void run() {
         if (!running) {
+            try {
+                socket.joinGroup(group);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Log.d(TAG, "Multicast client running...");
 
             running = true;
 
             byte[] bytes = new byte[32000 + 1];
-            DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
-
             while (running) {
 
                 try {
-                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+                    DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
 
                     socket.receive(packet);
+
+                    ByteArrayInputStream byteArrayInputStream =
+                            new ByteArrayInputStream(bytes);
 
                     TigersARProtos.ARMessage newMessage = TigersARProtos.ARMessage.parseDelimitedFrom(byteArrayInputStream);
 
                     byteArrayInputStream.close();
 
-                    if (message == null || newMessage.getTimestamp() > message.getTimestamp()) {
+                    if (newMessage != null && (message == null || newMessage.getTimestamp() > message.getTimestamp())) {
                         message = newMessage;
                         if (callback != null) {
                             callback.onNewMessage(newMessage);
@@ -79,19 +86,14 @@ public class TigersARMulticastClient implements Runnable {
                     e.printStackTrace();
                 }
 
-                packet.setLength(0);
-
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            try {
-                socket.leaveGroup(group);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+            running = false;
             Log.d(TAG, "Multicast client stopped");
         }
     }
@@ -99,9 +101,10 @@ public class TigersARMulticastClient implements Runnable {
     public void stop() {
         Log.d(TAG, "Multicast client stopping...");
         running = false;
+        socket.close();
     }
 
-    public static NetworkInterface getWlanEth() throws SocketException {
+    private static NetworkInterface getWlanEth() throws SocketException {
         Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
         NetworkInterface wlan0;
         while (enumeration.hasMoreElements()) {
